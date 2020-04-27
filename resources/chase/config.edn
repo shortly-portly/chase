@@ -1,0 +1,53 @@
+{:duct.profile/base
+ {:duct.core/project-ns chase
+
+  :duct.router/ataraxy
+  {:routes
+   {[:get "/"] [:chase.handler.users/list]
+    [:get "/detail/" id] [:tjape.handler.generic/detail id]
+    [:get "/new"] [:tjape.handler.generic/new]
+    [:post "/save"] [:tjape.handler.generic/post]}}
+
+  ; handlers
+  [:tjape.handler.generic/list :chase.handler.users/list]
+  {:sql ["SELECT * FROM user"]}
+
+  [:tjape.handler.generic/detail]
+  {:sql ["SELECT * FROM user WHERE id = ?" :id]
+   :view #ig/ref :tjape.view.generic/detail}
+
+  [:tjape.handler.generic/new]
+  {:fields [:firstname :lastname :age :wobble]
+   :submit-url "/save"}
+
+  [:tjape.handler.generic/post]
+  {
+   :entity :user
+   :success-route "/"
+   :error-route "/new"}
+
+  ; views
+  [:tjape.view.generic/index] {}
+  [:tjape.view.generic/detail] {}
+  [:tjape.view.generic/list] {}
+  [:tjape.view.generic/new] {}
+
+  ; migrations
+  :duct.migrator/ragtime
+  {:migrations [#ig/ref :chase.migrations/create-user]}
+
+  [:duct.migrator.ragtime/sql :chase.migrations/create-user]
+  {:up [#duct/resource "chase/migrations/create-user.up.sql"]
+   :down [#duct/resource "chase/migrations/create-user.down.sql"]}
+
+  }
+
+ :duct.profile/dev   #duct/include "dev"
+ :duct.profile/local #duct/include "local"
+ :duct.profile/prod  {}
+
+ :duct.module/logging {}
+ :duct.module.web/site
+ {}
+ :duct.module/sql
+ {}}
